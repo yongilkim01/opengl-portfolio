@@ -1,3 +1,9 @@
+# Build
+build/
+.vscode/
+.cache/
+*.sh
+
 # Prerequisites
 *.d
 
