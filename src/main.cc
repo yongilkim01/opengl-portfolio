@@ -13,21 +13,18 @@ const char *fragment_shader_source = "#version 330 core\n"
   "out vec4 frag_color;\n"
   "void main()\n"
   "{\n"
-  "   frag_color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+  "   frag_color = vec4(0.0f, 0.5f, 0.2f, 1.0f);\n"
   "}\n\0";
 
+const char *fragment_shader_source2 = "#version 330 core\n"
+  "out vec4 frag_color;\n"
+  "void main()\n"
+  "{\n"
+  "   frag_color = vec4(0.0f, 1.0f, 1.0f, 1.0f);\n"
+  "}\n\0";
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) 
-{
-  SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
-  glViewport(0, 0, width, height);
-}
-
-void on_key_event(GLFWwindow* window) 
-{
-  if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, true);
-}
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void on_key_event(GLFWwindow* window);
 
 int main (int argc, const char** argv)
 {
@@ -73,24 +70,58 @@ int main (int argc, const char** argv)
 
   // Graphic pipeline
 
+  /*
   float vertex_data[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f,  0.5f, 0.0f
+    0.5f,  0.5f, 0.0f,  // 우측 상단
+    0.5f, -0.5f, 0.0f,  // 우측 하단
+    -0.5f, -0.5f, 0.0f,  // 좌측 하단
+    -0.5f,  0.5f, 0.0f   // 좌측 상단
+  };
+  */
+
+  float firstTriangle[] = {
+    -0.9f, -0.5f, 0.0f,  // left 
+    -0.0f, -0.5f, 0.0f,  // right
+    -0.45f, 0.5f, 0.0f,  // top 
+  };
+  float secondTriangle[] = {
+    0.0f, -0.5f, 0.0f,  // left
+    0.9f, -0.5f, 0.0f,  // right
+    0.45f, 0.5f, 0.0f   // top 
   };
 
-  //////////////////////////////////////////////////////////////////////////////
-  //                            Vertex Array Object                           //
-  //////////////////////////////////////////////////////////////////////////////
-  
-  unsigned int VAO, VBO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
+  unsigned int indices[] = {  // 0부터 시작한다는 것을 명심하세요!
+    0, 1, 3,   // 첫 번째 삼각형
+    1, 2, 3    // 두 번째 삼각형
+  };  
 
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  //////////////////////////////////////////////////////////////////////////////
+  //                    Vetex Object, Vertex Array Object                    //
+  //////////////////////////////////////////////////////////////////////////////
+
+  // check variable
+  int is_sucess;
+  char info_log[512];
   
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+  unsigned int VAO[2], VBO[2], EBO;
+  glGenVertexArrays(2, VAO);
+  glGenBuffers(2, VBO);
+  glGenBuffers(1, &EBO);
+
+  glBindVertexArray(VAO[0]);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+  glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+
+  glBindVertexArray(VAO[1]);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+
+  glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+  glEnableVertexAttribArray(0);
 
   //////////////////////////////////////////////////////////////////////////////
   //                             Vertex Shader                                //
@@ -104,10 +135,8 @@ int main (int argc, const char** argv)
   glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
   glCompileShader(vertex_shader);
 
-  // check vertex shader creation
-  int is_sucess;
-  char info_log[512];
   glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &is_sucess);
+
   if (!is_sucess)
   {
     glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
@@ -125,6 +154,30 @@ int main (int argc, const char** argv)
   // compile fragment shader
   glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
   glCompileShader(fragment_shader);
+
+  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &is_sucess);
+  
+  if (!is_sucess)
+  {
+    glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
+    SPDLOG_ERROR("failed create fragment shader: {}", info_log);
+  }
+
+  // create fragment shader
+  unsigned int fragment_shader2;
+  fragment_shader2 = glCreateShader(GL_FRAGMENT_SHADER);
+
+  // compile fragment shader
+  glShaderSource(fragment_shader2, 1, &fragment_shader_source2, NULL);
+  glCompileShader(fragment_shader2);
+
+  glGetShaderiv(fragment_shader2, GL_COMPILE_STATUS, &is_sucess);
+  
+  if (!is_sucess)
+  {
+    glGetShaderInfoLog(fragment_shader2, 512, NULL, info_log);
+    SPDLOG_ERROR("failed create fragment shader: {}", info_log);
+  }
 
   //////////////////////////////////////////////////////////////////////////////
   //                             Shader program                               //
@@ -147,18 +200,33 @@ int main (int argc, const char** argv)
     SPDLOG_ERROR("failed create vertex shader: {}", info_log);
   }
 
-  SPDLOG_INFO("Sucess create shader program!");
+  // create shader program
+  unsigned int shader_program2;
+  shader_program2 = glCreateProgram();
+
+  // attach shader with shader program
+  glAttachShader(shader_program2, vertex_shader);
+  glAttachShader(shader_program2, fragment_shader2);
+  glLinkProgram(shader_program2);
+
+  // check link shader
+  glGetProgramiv(shader_program2, GL_LINK_STATUS, &is_sucess);
+  if (!is_sucess)
+  {
+    glGetShaderInfoLog(shader_program2, 512, NULL, info_log);
+    SPDLOG_ERROR("failed create vertex shader: {}", info_log);
+  }
+
 
   //////////////////////////////////////////////////////////////////////////////
-  //                          Linking Vetex Attribute                         //
+  //                                  Render                                  //
   //////////////////////////////////////////////////////////////////////////////
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-
-  SPDLOG_INFO("Sucess linking vertex pointer!");
+  
 
   SPDLOG_INFO("Start main loop");
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
   while(!glfwWindowShouldClose(window))
   {
     // Input
@@ -169,7 +237,13 @@ int main (int argc, const char** argv)
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shader_program);
-    glBindVertexArray(VAO);
+    glBindVertexArray(VAO[0]);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glUseProgram(shader_program2);
+
+    glBindVertexArray(VAO[1]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glfwSwapBuffers(window);
@@ -183,4 +257,16 @@ int main (int argc, const char** argv)
   glfwTerminate();
   
   return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) 
+{
+  SPDLOG_INFO("framebuffer size changed: ({} x {})", width, height);
+  glViewport(0, 0, width, height);
+}
+
+void on_key_event(GLFWwindow* window) 
+{
+  if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
 }
