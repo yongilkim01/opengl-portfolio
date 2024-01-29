@@ -8,11 +8,16 @@ set(WINDOW_WIDTH 960)
 set(WINDOW_HEIGHT 540) 
 
 project(${PROJECT_NAME})
-add_executable(${PROJECT_NAME} src/main.cc)
+add_executable(${PROJECT_NAME} 
+    src/main.cc 
+    src/common.cc
+    src/shader.cc
+)
 
 include(Dependency.cmake)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${DEP_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME}  PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_directories(${PROJECT_NAME} PUBLIC ${DEP_LIB_DIR})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${DEP_LIBS})
 
