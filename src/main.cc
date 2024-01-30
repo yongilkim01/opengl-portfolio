@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shader.h"
+#include "shader_program.h"
 
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
@@ -54,8 +55,8 @@ int main (int argc, const char** argv)
   //                                 Shader                                   //
   //////////////////////////////////////////////////////////////////////////////
 
-  auto vertex_shader = Shader::create_from_file("./shader/simple.vs", GL_VERTEX_SHADER);
-  auto fragment_shader = Shader::create_from_file("./shader/simple.fs", GL_FRAGMENT_SHADER);
+  ShaderSharedPtr vertex_shader = Shader::create_from_file("./shader/simple.vs", GL_VERTEX_SHADER);
+  ShaderSharedPtr fragment_shader = Shader::create_from_file("./shader/simple.fs", GL_FRAGMENT_SHADER);
   SPDLOG_INFO("vertex shader id: {}", vertex_shader->get());
   SPDLOG_INFO("fragment shader id: {}", fragment_shader->get());
 
@@ -63,24 +64,8 @@ int main (int argc, const char** argv)
   //                             Shader program                               //
   //////////////////////////////////////////////////////////////////////////////
 
-  // create shader program
-  int is_sucess;
-  char info_log[512];
-  unsigned int shader_program;
-  shader_program = glCreateProgram();
-
-  // attach shader with shader program
-  glAttachShader(shader_program, vertex_shader->get());
-  glAttachShader(shader_program, fragment_shader->get());
-  glLinkProgram(shader_program);
-
-  // check link shader
-  glGetProgramiv(shader_program, GL_LINK_STATUS, &is_sucess);
-  if (!is_sucess)
-  {
-    glGetShaderInfoLog(shader_program, 512, NULL, info_log);
-    SPDLOG_ERROR("failed create vertex shader: {}", info_log);
-  }
+  auto shader_program = ShaderProgram::create({fragment_shader, vertex_shader});
+  SPDLOG_INFO("shader program id: {}", shader_program->get());
 
   //////////////////////////////////////////////////////////////////////////////
   //                    Vetex Object, Vertex Array Object                    //
@@ -130,14 +115,14 @@ int main (int argc, const char** argv)
     // Update
     float time_value = glfwGetTime();
     float green_value = (sin(time_value) / 2.0f) + 0.5f;
-    int vertex_color_loc = glGetUniformLocation(shader_program, "our_color");
+    int vertex_color_loc = glGetUniformLocation(shader_program->get(), "our_color");
 
 
     // Render
     glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shader_program);
+    glUseProgram(shader_program->get());
     glBindVertexArray(VAO);
     //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glDrawArrays(GL_TRIANGLES, 0, 3);
