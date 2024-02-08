@@ -1,6 +1,4 @@
-#include "common.h"
-#include "shader.h"
-#include "shader_program.h"
+#include "context.h"
 
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
@@ -48,29 +46,22 @@ int main (int argc, const char** argv)
   auto glVersion = reinterpret_cast<const char*>(glGetString(GL_VERSION));
   SPDLOG_INFO("OpenGL context version: {}", glVersion);
 
+  auto context = Context::create();
+  if(!context)
+  {
+    SPDLOG_ERROR("failed to create context");
+    glfwTerminate();
+    return -1;
+  }
+
   framebuffer_size_callback(window, WINDOW_WIDTH, WINDOW_HEIGHT);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  //////////////////////////////////////////////////////////////////////////////
-  //                                 Shader                                   //
-  //////////////////////////////////////////////////////////////////////////////
-
-  ShaderSharedPtr vertex_shader = Shader::create_from_file("./shader/simple.vs", GL_VERTEX_SHADER);
-  ShaderSharedPtr fragment_shader = Shader::create_from_file("./shader/simple.fs", GL_FRAGMENT_SHADER);
-  SPDLOG_INFO("vertex shader id: {}", vertex_shader->get());
-  SPDLOG_INFO("fragment shader id: {}", fragment_shader->get());
-
-  //////////////////////////////////////////////////////////////////////////////
-  //                             Shader program                               //
-  //////////////////////////////////////////////////////////////////////////////
-
-  auto shader_program = ShaderProgram::create({fragment_shader, vertex_shader});
-  SPDLOG_INFO("shader program id: {}", shader_program->get());
 
   //////////////////////////////////////////////////////////////////////////////
   //                    Vetex Object, Vertex Array Object                    //
   //////////////////////////////////////////////////////////////////////////////
-
+  /*
   float vertex_data[] = {
     // 위치              // 컬러
      0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 우측 하단
@@ -95,7 +86,7 @@ int main (int argc, const char** argv)
   // 컬러 attribute
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
-
+  */
 
   //////////////////////////////////////////////////////////////////////////////
   //                                  Render                                  //
@@ -112,25 +103,13 @@ int main (int argc, const char** argv)
     // Input
     on_key_event(window);
 
-    // Update
-    float time_value = glfwGetTime();
-    float green_value = (sin(time_value) / 2.0f) + 0.5f;
-    int vertex_color_loc = glGetUniformLocation(shader_program->get(), "our_color");
-
-
-    // Render
-    glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(shader_program->get());
-    glBindVertexArray(VAO);
-    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    //glUniform4f(vertex_color_loc, 0.0f, green_value, 0.0f, 1.0f);
+    context->render();
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+
+  context.reset();
 
   glfwTerminate();
   
