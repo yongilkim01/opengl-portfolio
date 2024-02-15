@@ -47,3 +47,8 @@ bool ShaderProgram::link(const std::vector<ShaderSharedPtr>& shaders)
     }
     return true;
 }
+
+void ShaderProgram::use() const
+{
+    glUseProgram(m_shader_program);
+}

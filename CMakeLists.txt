@@ -14,6 +14,8 @@ add_executable(${PROJECT_NAME}
     src/shader.cc
     src/shader_program.cc
     src/context.cc
+    src/buffer.cc
+    src/vertex_layout.cc
 )
 
 include(Dependency.cmake)

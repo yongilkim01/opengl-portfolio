@@ -11,6 +11,7 @@ public:
     static ShaderProgramUniquePtr create(const std::vector<ShaderSharedPtr>& shaders);
     ~ShaderProgram();
     uint32_t get() const { return m_shader_program; }
+    void use() const;
 
 private:
     ShaderProgram() {}
