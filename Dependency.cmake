@@ -15,7 +15,6 @@ ExternalProject_Add(
     TEST_COMMAND ""
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${DEP_INSTALL_DIR}
 )
-
 set(DEP_LIST ${DEP_LIST} dep-spdlog)
 set(DEP_LIBS ${DEP_LIBS} spdlog$<$<CONFIG:Debug>:d>)
 
@@ -34,7 +33,6 @@ ExternalProject_Add(
         -DGLFW_BUILD_TESTS=OFF
         -DGLFW_BUILD_DOCS=OFF
 )
-
 set(DEP_LIST ${DEP_LIST} dep-glfw)
 set(DEP_LIBS ${DEP_LIBS} glfw3)
 
@@ -53,3 +51,20 @@ ExternalProject_Add(
     )
 set(DEP_LIST ${DEP_LIST} dep-glad)
 set(DEP_LIBS ${DEP_LIBS} glad)
+
+# stb
+ExternalProject_Add(
+    dep-stb
+    GIT_REPOSITORY "https://github.com/nothings/stb"
+    GIT_TAG "master"
+    GIT_SHALLOW 1
+    UPDATE_COMMAND ""
+    PATCH_COMMAND ""
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    TEST_COMMAND ""
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
+        ${PROJECT_BINARY_DIR}/dep-stb-prefix/src/dep-stb/stb_image.h
+        ${DEP_INSTALL_DIR}/include/stb/stb_image.h
+    )
+set(DEP_LIST ${DEP_LIST} dep-stb)
