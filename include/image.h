@@ -21,7 +21,7 @@ private:
     int width { 0 };
     int height { 0 };
     int channel_cnt { 0 };
-    uint8_t* data { nullptr };
+    unsigned char * data { nullptr };
 };
 
 #endif // __IMAGE_H__

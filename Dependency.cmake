@@ -54,7 +54,7 @@ set(DEP_LIBS ${DEP_LIBS} glad)
 
 # stb
 ExternalProject_Add(
-    dep-stb
+    dep_stb
     GIT_REPOSITORY "https://github.com/nothings/stb"
     GIT_TAG "master"
     GIT_SHALLOW 1
@@ -64,7 +64,7 @@ ExternalProject_Add(
     BUILD_COMMAND ""
     TEST_COMMAND ""
     INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
-        ${PROJECT_BINARY_DIR}/dep-stb-prefix/src/dep-stb/stb_image.h
+        ${PROJECT_BINARY_DIR}/dep_stb-prefix/src/dep_stb/stb_image.h
         ${DEP_INSTALL_DIR}/include/stb/stb_image.h
     )
-set(DEP_LIST ${DEP_LIST} dep-stb)
+set(DEP_LIST ${DEP_LIST} dep_stb)

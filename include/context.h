@@ -6,6 +6,7 @@
 #include "shader_program.h"
 #include "buffer.h"
 #include "vertex_layout.h"
+#include "image.h"
 
 CLASS_PTR(Context)
 class Context
@@ -23,6 +24,8 @@ private:
     VertexLayoutUniquePtr m_vertex_layout; // vertex array object
     BufferUniquePtr m_vertex_buffer;
     BufferUniquePtr m_index_buffer;
+
+    uint32_t texture;
 };
 
 #endif // __CONTEXT_H__
