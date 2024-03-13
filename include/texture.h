@@ -14,7 +14,6 @@ public:
 ////////////////////////// create function //////////////////////////
 private:
     void create_texture();
-    void set_texture_from_image(const Image* image);
 public:
     static TextureUniquePtr create_from_image(const Image* image);
     void bind() const;

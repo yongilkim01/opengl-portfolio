@@ -13,6 +13,9 @@ public:
     uint32_t get() const { return m_shader_program; }
     void use() const;
 
+    void set_uniform(const std::string& name, int value) const;
+    void set_uniform(const std::string& name, const glm::mat4& value) const;
+
 private:
     ShaderProgram() {}
     bool link(const std::vector<ShaderSharedPtr>& shaders);

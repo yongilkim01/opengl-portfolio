@@ -7,6 +7,9 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 #include <spdlog/spdlog.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define CLASS_PTR(class_name) \
 class class_name; \
