@@ -14,34 +14,34 @@ ShaderProgramUniquePtr ShaderProgram::create(const std::vector<ShaderSharedPtr>&
 
 ShaderProgram::~ShaderProgram()
 {
-    if (m_shader_program)
+    if (shader_program)
     {
-        glDeleteProgram(m_shader_program);
+        glDeleteProgram(shader_program);
     }
 }
 
 bool ShaderProgram::link(const std::vector<ShaderSharedPtr>& shaders)
 {
     // opengl 로부터 shader program 생성
-    m_shader_program = glCreateProgram();
+    shader_program = glCreateProgram();
 
     // 입력으로 전달받은 shader의 수(vectex, fragment)만큼 반복하여 shader program에 부착
     for (auto& shader : shaders)
-        glAttachShader(m_shader_program, shader->get());
+        glAttachShader(shader_program, shader->get());
 
     // shader program 연결
-    glLinkProgram(m_shader_program);
+    glLinkProgram(shader_program);
 
     // 컴파일 체크
     int is_sucess;
 
     // shader program으로부터 shader 정보를 탐색하여 성공 여부를 is_sucess에 반환
-    glGetProgramiv(m_shader_program, GL_LINK_STATUS, &is_sucess);
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &is_sucess);
 
     if (!is_sucess)
     {
         char info_log[1024];
-        glGetProgramInfoLog(m_shader_program, 1024, nullptr, info_log);
+        glGetProgramInfoLog(shader_program, 1024, nullptr, info_log);
         SPDLOG_ERROR("failed to link program: {}", info_log);
         return false;
     }
@@ -50,16 +50,29 @@ bool ShaderProgram::link(const std::vector<ShaderSharedPtr>& shaders)
 
 void ShaderProgram::use() const
 {
-    glUseProgram(m_shader_program);
+    glUseProgram(shader_program);
 }
 
 void ShaderProgram::set_uniform(const std::string& name, int value) const
 {
-    auto loc = glGetUniformLocation(m_shader_program, name.c_str());
-    glUniform1i(loc, value);
+    auto location = glGetUniformLocation(shader_program, name.c_str());
+    glUniform1i(location, value);
 }
+
 void ShaderProgram::set_uniform(const std::string& name, const glm::mat4& value) const
 {
-    auto loc = glGetUniformLocation(m_shader_program, name.c_str());
-    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+    auto location = glGetUniformLocation(shader_program, name.c_str());
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void ShaderProgram::set_uniform(const std::string& name, float value) const
+{
+    auto location = glGetUniformLocation(shader_program, name.c_str());
+    glUniform1f(location, value);
+}
+
+void ShaderProgram::set_uniform(const std::string& name, const glm::vec3& value) const
+{
+    auto location = glGetUniformLocation(shader_program, name.c_str());
+    glUniform3fv(location, 1, glm::value_ptr(value));
 }
