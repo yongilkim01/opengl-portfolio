@@ -156,6 +156,7 @@ void Context::render()
     }
     ImGui::End();
 
+    /*
     std::vector<glm::vec3> cube_position = {
         glm::vec3( 0.0f, 0.0f, 0.0f),
         glm::vec3( 2.0f, 5.0f, -15.0f),
@@ -168,6 +169,7 @@ void Context::render()
         glm::vec3( 1.5f, 0.2f, -1.5f),
         glm::vec3(-1.3f, 1.0f, -1.5f),
     };
+    */
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -203,6 +205,7 @@ void Context::render()
     m_shader_program->set_uniform("ambient_strength", ambient_strength);
     m_shader_program->set_uniform("light_position", light_position);
 
+    /*
     for (size_t i = 0; i < cube_position.size(); i++)
     {
         auto& pos = cube_position[i];
@@ -214,6 +217,14 @@ void Context::render()
     
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     }
+    */
+
+    auto model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    auto transform = projection * view * model;
+    m_shader_program->set_uniform("model_transform", model);
+    m_shader_program->set_uniform("transform", transform);
+
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
 void Context::reshape(int width, int height)

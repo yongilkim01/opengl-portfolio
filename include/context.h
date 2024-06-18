@@ -51,7 +51,7 @@ private:
     glm::vec2 prev_mouse_position { glm::vec2(0.0f) };
 
     // light parameter
-    glm::vec3 light_position { glm::vec3(3.0f, 3.0f, 3.0f) };
+    glm::vec3 light_position { glm::vec3(0, 1.0f, 1.0f) };
     glm::vec3 light_color { glm::vec3(1.0f, 1.0f, 1.0f) };
     glm::vec3 object_color { glm::vec3(1.0f, 0.5f, 0.0f) };
     float ambient_strength { 0.1f };

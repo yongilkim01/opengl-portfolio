@@ -12,7 +12,7 @@ out vec3 position;
 
 void main() {
     gl_Position = transform * vec4(a_position, 1.0);
-    normal = (transpose(inverse(model_transform)) * vec4(a_normal, 0.0)).xyz;
+    normal = a_normal;
     texture_coord = a_texture_coord;
     position = (model_transform * vec4(a_position, 1.0)).xyz;
 }
